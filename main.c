@@ -152,11 +152,11 @@
 enum { COL_FIRST_NAME = 0, COL_LAST_NAME, COL_YEAR_BORN, NUM_COLS };
 
 int scan_directory(char *pathName, GtkTreeStore *treestore,
-                   GtkTreeIter *toplevel, GtkTreeIter **child, int count) {
+                   GtkTreeIter *toplevel, int count) {
   char newPath[PATH_MAX + 1];
   DIR *dir = NULL;
   struct dirent entry;
-
+  GtkTreeIter child[100];
   struct dirent *entryPtr = NULL;
   int retval = 0;
   int sec_count = 0;
@@ -166,8 +166,8 @@ int scan_directory(char *pathName, GtkTreeStore *treestore,
     printf("Error opening %s: %s", pathName, strerror(errno));
     return 0;
   }
-    gtk_tree_store_append(treestore, child[count], NULL);
-    gtk_tree_store_set(treestore, child[count], COL_FIRST_NAME, entry.d_name,
+    gtk_tree_store_append(treestore, &child[count], NULL);
+    gtk_tree_store_set(treestore, &child[count], COL_FIRST_NAME, entry.d_name,
                        -1);
   retval = readdir_r(dir, &entry, &entryPtr);
   while (entryPtr != NULL) {
@@ -182,16 +182,16 @@ int scan_directory(char *pathName, GtkTreeStore *treestore,
     if (lstat(newPath, &entryInfo) == 0) {
       if (S_ISDIR(entryInfo.st_mode)) {
         //                printf("new dir: %s/\n", newPath);
-        gtk_tree_store_append(treestore, child[count+1], child[count]);
-        gtk_tree_store_set(treestore, child[count+1], COL_FIRST_NAME, entry.d_name,
+        gtk_tree_store_append(treestore, &child[count+1], &child[count]);
+        gtk_tree_store_set(treestore, &child[count+1], COL_FIRST_NAME, entry.d_name,
                            -1);
         //                printf("+ %s\n", entry.d_name);
-        scan_directory(newPath, treestore, toplevel, child, ++count);
+        scan_directory(newPath, treestore, toplevel, ++count);
       } else if (S_ISREG(entryInfo.st_mode)) {
         //                printf("\t%s has %lld bytes\n", newPath, (long
         //                long)entryInfo.st_size );
-        gtk_tree_store_append(treestore, child[count], child[count]);
-        gtk_tree_store_set(treestore, child[count], COL_FIRST_NAME, entry.d_name, -1);
+        gtk_tree_store_append(treestore, &child[count+1], &child[count]);
+        gtk_tree_store_set(treestore, &child[count+1], COL_FIRST_NAME, entry.d_name, -1);
         //                printf("  %s has %lld bytes\n", entry.d_name,
         //                       (long long)entryInfo.st_size);
       } else if (S_ISLNK(entryInfo.st_mode)) {
@@ -214,7 +214,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore,
 static GtkTreeModel *create_and_fill_model(char *pathName) {
   GtkTreeStore *treestore;
   GtkTreeIter toplevel, child, toplevel2, child2;
-  GtkTreeIter * mass_child = (GtkTreeIter*)malloc(sizeof(GtkTreeIter)*100);
+//  GtkTreeIter * mass_child = (GtkTreeIter*)malloc(sizeof(GtkTreeIter)*100);
   treestore =
       gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_UINT);
 //      /* Append a top level row and leave it empty */
@@ -259,7 +259,7 @@ static GtkTreeModel *create_and_fill_model(char *pathName) {
 //                       COL_LAST_NAME, "Average",
 //                       COL_YEAR_BORN, (guint) 1985,
 //                       -1);
-  scan_directory(pathName, treestore, &toplevel, &mass_child, 0);
+  scan_directory(pathName, treestore, &toplevel, 0);
   return GTK_TREE_MODEL(treestore);
 }
 

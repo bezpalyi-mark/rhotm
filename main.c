@@ -8,8 +8,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-
 #include <gtk/gtk.h>
 
 enum { COL_FIRST_NAME = 0, COL_LAST_NAME, COL_YEAR_BORN, NUM_COLS };
@@ -75,6 +73,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore,
 static GtkTreeModel *create_and_fill_model(char *pathName) {
     GtkTreeStore *treestore;
     GtkTreeIter toplevel, child, toplevel2, child2;
+
     treestore =
             gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_UINT);
 
@@ -113,6 +112,7 @@ static GtkWidget *create_view_and_model(char *path) {
     GtkCellRenderer *renderer;
     GtkWidget *view;
     GtkTreeModel *model;
+    GtkWidget* scrollbar;
 
     view = gtk_tree_view_new();
 
@@ -120,7 +120,7 @@ static GtkWidget *create_view_and_model(char *path) {
 
     col = gtk_tree_view_column_new();
 
-    gtk_tree_view_column_set_title(col, "First Name");
+    gtk_tree_view_column_set_title(col, "Path");
 
     /* pack tree view column into tree view */
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
@@ -138,7 +138,7 @@ static GtkWidget *create_view_and_model(char *path) {
 
     col = gtk_tree_view_column_new();
 
-    gtk_tree_view_column_set_title(col, "Last Name");
+    gtk_tree_view_column_set_title(col, "Size");
 
     /* pack tree view column into tree view */
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
@@ -158,12 +158,12 @@ static GtkWidget *create_view_and_model(char *path) {
 
     /* --- Column #3 --- */
 
-    col = gtk_tree_view_column_new();
+    /*col = gtk_tree_view_column_new();
 
     gtk_tree_view_column_set_title(col, "Age");
 
-    /* pack tree view column into tree view */
-    gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
+    // pack tree view column into tree view
+    gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);*/
 
     renderer = gtk_cell_renderer_text_new();
 

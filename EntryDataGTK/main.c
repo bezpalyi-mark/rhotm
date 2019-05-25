@@ -1,7 +1,6 @@
 #include "FirstPart.h"
 
 
-
 int main(int argc, char ** argv) {
 
     struct Data * data;

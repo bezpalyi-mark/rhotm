@@ -28,8 +28,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count) {
   lstat(pathName, &entryInfo_begin);
   if (count == 0) {
     gtk_tree_store_append(treestore, &child[count], NULL);
-    gtk_tree_store_set(treestore, &child[count], COL_NAME, pathName, COL_SIZE,
-                       entryInfo_begin.st_size, -1);
+    gtk_tree_store_set(treestore, &child[count], COL_NAME, pathName, -1);
   }
   while (entryPtr != NULL) {
     struct stat entryInfo;
@@ -43,8 +42,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count) {
     if (lstat(newPath, &entryInfo) == 0) {
       if (S_ISDIR(entryInfo.st_mode)) {
         gtk_tree_store_append(treestore, &child[count + 1], &child[count]);
-        gtk_tree_store_set(treestore, &child[count + 1], COL_NAME, entry.d_name,
-                           COL_SIZE, (guint)entryInfo.st_size, -1);
+        gtk_tree_store_set(treestore, &child[count + 1], COL_NAME, entry.d_name, -1);
         scan_directory(newPath, treestore, ++count);
         --count;
       } else if (S_ISREG(entryInfo.st_mode)) {
@@ -159,7 +157,7 @@ int main(int argc, char **argv) {
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   g_signal_connect(window, "delete_event", gtk_main_quit, NULL); /* dirty */
 
-  view = create_view_and_model("/home/mark/Downloads/Telegram Desktop/");
+  view = create_view_and_model("/home/hunterlan/NovaLab/GitLab");
 
   gtk_container_add(GTK_CONTAINER(window), view);
 

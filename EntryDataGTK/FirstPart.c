@@ -28,5 +28,7 @@ void get_data(GtkButton *btn, struct Data * datas)
         datas->path = " ";
     }
 
+    gtk_main_quit();
+
 }
 

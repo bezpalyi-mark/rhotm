@@ -42,7 +42,8 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count) {
     if (lstat(newPath, &entryInfo) == 0) {
       if (S_ISDIR(entryInfo.st_mode)) {
         gtk_tree_store_append(treestore, &child[count + 1], &child[count]);
-        gtk_tree_store_set(treestore, &child[count + 1], COL_NAME, entry.d_name, -1);
+        gtk_tree_store_set(treestore, &child[count + 1], COL_NAME, entry.d_name,
+                           -1);
         scan_directory(newPath, treestore, ++count);
         --count;
       } else if (S_ISREG(entryInfo.st_mode)) {

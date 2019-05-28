@@ -35,18 +35,17 @@ GtkWidget *create_view_and_model_for_data(struct Data * data)
     GtkWidget *labelPath, *labelMask;
     GtkButton *submitBtn;
     GtkEntry *pathTxTBox, *maskTxTBox;
-    //GtkEntry ** array = (GtkEntry **)malloc(2 * sizeof(GtkEntry *));
 
     view = gtk_table_new(3,3, false);
 
     labelPath = gtk_label_new("Entry path");
     gtk_table_attach_defaults(GTK_TABLE(view), labelPath, 0, 1, 0, 1);
     pathTxTBox = GTK_ENTRY(gtk_entry_new());
-    gtk_table_attach_defaults(GTK_TABLE(view), pathTxTBox, 1, 2, 0, 1);
+    gtk_table_attach_defaults(GTK_TABLE(view), (GtkWidget *) pathTxTBox, 1, 2, 0, 1);
     labelMask = gtk_label_new("Entry mask");
     gtk_table_attach_defaults(GTK_TABLE(view), labelMask, 0, 1, 1, 2);
     maskTxTBox = GTK_ENTRY(gtk_entry_new());
-    gtk_table_attach_defaults(GTK_TABLE(view), maskTxTBox, 1, 2, 1, 2);
+    gtk_table_attach_defaults(GTK_TABLE(view), (GtkWidget *) maskTxTBox, 1, 2, 1, 2);
     submitBtn = GTK_BUTTON(gtk_button_new_with_label("Submit"));
 
     data->pathTxT = pathTxTBox;

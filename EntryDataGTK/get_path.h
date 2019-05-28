@@ -11,7 +11,7 @@ struct Data
     GtkEntry * pathTxT, *maskTxT;
 };
 
- GtkWidget *create_view_and_model_for_data(struct Data * data);
+GtkWidget *create_view_and_model_for_data(struct Data * data);
 void get_data(GtkButton *btn, struct Data * datas);
 
 

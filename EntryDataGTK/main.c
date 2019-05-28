@@ -77,7 +77,7 @@ void age_cell_data_func(GtkTreeViewColumn *col, GtkCellRenderer *renderer,
 
     gtk_tree_model_get(model, iter, COL_SIZE, &size, -1);
 
-    if(size != 0)
+    if(size != -1)
         g_snprintf(buf, sizeof(buf), "%ld bites", size);
 
     g_object_set(renderer, "foreground-set", FALSE, NULL); /* print this normal */

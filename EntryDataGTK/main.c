@@ -22,7 +22,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count) {
     if (count == 0) {
         gtk_tree_store_append(treestore, &child[count], NULL);
         gtk_tree_store_set(treestore, &child[count], COL_NAME, pathName, COL_SIZE,
-                           entryInfo_begin.st_size, -1);
+                           -1, -1);
     }
     while (entryPtr != NULL) {
         struct stat entryInfo;
@@ -37,7 +37,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count) {
             if (S_ISDIR(entryInfo.st_mode)) {
                 gtk_tree_store_append(treestore, &child[count + 1], &child[count]);
                 gtk_tree_store_set(treestore, &child[count + 1], COL_NAME, entry.d_name,
-                                   COL_SIZE, (guint)entryInfo.st_size, -1);
+                                   COL_SIZE, -1, -1);
                 scan_directory(newPath, treestore, ++count);
                 --count;
             } else if (S_ISREG(entryInfo.st_mode)) {
@@ -77,7 +77,8 @@ void age_cell_data_func(GtkTreeViewColumn *col, GtkCellRenderer *renderer,
 
     gtk_tree_model_get(model, iter, COL_SIZE, &size, -1);
 
-    g_snprintf(buf, sizeof(buf), "%ld bites", size);
+    if(size != 0)
+        g_snprintf(buf, sizeof(buf), "%ld bites", size);
 
     g_object_set(renderer, "foreground-set", FALSE, NULL); /* print this normal */
 

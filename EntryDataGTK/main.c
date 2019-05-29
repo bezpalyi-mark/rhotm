@@ -43,7 +43,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count) {
             } else if (S_ISREG(entryInfo.st_mode)) {
                 gtk_tree_store_append(treestore, &child[count + 1], &child[count]);
                 gtk_tree_store_set(treestore, &child[count + 1], COL_NAME, entry.d_name,
-                                   COL_SIZE, (guint)entryInfo.st_size, -1);
+                                   COL_SIZE, (gulong)entryInfo.st_size, -1);
             } else if (S_ISLNK(entryInfo.st_mode)) {
                 char targetName[PATH_MAX + 1];
                 if (readlink(pathName, targetName, PATH_MAX) != -1) {
@@ -76,9 +76,17 @@ void age_cell_data_func(GtkTreeViewColumn *col, GtkCellRenderer *renderer,
     gchar buf[64];
 
     gtk_tree_model_get(model, iter, COL_SIZE, &size, -1);
-
-    if(size != -1)
+    if(size >= KB && size < MB){
+        size /= KB;
+        g_snprintf(buf, sizeof(buf), "%ld KB", size);
+    }
+    else if(size >= MB && size < GB){
+        size /= MB;
+        g_snprintf(buf, sizeof(buf), "%ld MB", size);
+    }
+    else if(size < KB) {
         g_snprintf(buf, sizeof(buf), "%ld bites", size);
+    }
 
     g_object_set(renderer, "foreground-set", FALSE, NULL); /* print this normal */
 

@@ -3,7 +3,9 @@
 //
 
 #include "gtk_librarys.h"
-
+#define KB 1000
+#define MB 1000000
+#define GB 1000000000
 struct Data
 {
     char * path;

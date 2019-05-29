@@ -15,5 +15,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdbool.h>
-
+struct Data {
+    char *path;
+    char *mask;
+    GtkEntry *pathTxT, *maskTxT;
+    int argc;
+    char **argv;
+};
 #endif //GTK_ALL_AGAINE_GTK_LIBRARYS_H

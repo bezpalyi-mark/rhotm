@@ -3,11 +3,12 @@
 //
 
 #include "get_path.h"
+#include "mask.h"
 
 enum { COL_NAME = 0, COL_SIZE, NUM_COLS };
 GtkTreeIter child[1000];
 
-int scan_directory(char *pathName, GtkTreeStore *treestore, int count)
+int scan_directory(char *pathName, GtkTreeStore *treestore, int count, int mode, struct Data * data)
 {
 	char newPath[PATH_MAX + 1];
 	DIR *dir = NULL;
@@ -44,30 +45,19 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count)
 				gtk_tree_store_set(treestore, &child[count + 1],
 						   COL_NAME, entry.d_name,
 						   COL_SIZE, -1, -1);
-				scan_directory(newPath, treestore, ++count);
+				scan_directory(newPath, treestore, ++count, mode, data);
 				--count;
 			} else if (S_ISREG(entryInfo.st_mode)) {
-				gtk_tree_store_append(treestore,
-						      &child[count + 1],
-						      &child[count]);
-				gtk_tree_store_set(treestore, &child[count + 1],
-						   COL_NAME, entry.d_name,
-						   COL_SIZE,
-						   (gulong)entryInfo.st_size,
-						   -1);
-			} else if (S_ISLNK(entryInfo.st_mode)) {
-				char targetName[PATH_MAX + 1];
-				if (readlink(pathName, targetName, PATH_MAX) !=
-				    -1) {
-					printf("\t%s -> %s\n", newPath,
-					       targetName);
-				} else {
-					printf("\t%s -> (invalid symbolic link!)\n",
-					       newPath);
-				}
-			} else {
-				printf("Error statting %s: %s\n", pathName,
-				       strerror(errno));
+			    if(mask(entry.d_name, mode, data)) {
+                    gtk_tree_store_append(treestore,
+                                          &child[count + 1],
+                                          &child[count]);
+                    gtk_tree_store_set(treestore, &child[count + 1],
+                                       COL_NAME, entry.d_name,
+                                       COL_SIZE,
+                                       (gulong) entryInfo.st_size,
+                                       -1);
+                }
 			}
 		}
 		readdir_r(dir, &entry, &entryPtr);
@@ -76,17 +66,17 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count)
 	return --count;
 }
 
-GtkTreeModel *create_and_fill_model(char *pathName)
+GtkTreeModel *create_and_fill_model(char *pathName, int mode, struct Data * data)
 {
 	GtkTreeStore *treestore;
 	GtkTreeIter toplevel;
 	treestore = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_ULONG);
-	scan_directory(pathName, treestore, 0);
+	scan_directory(pathName, treestore, 0, mode, data);
 	return GTK_TREE_MODEL(treestore);
 }
 
-void age_cell_data_func(GtkCellRenderer *renderer, GtkTreeModel *model,
-			GtkTreeIter *iter)
+void write_size(GtkCellRenderer *renderer, GtkTreeModel *model,
+                GtkTreeIter *iter)
 {
 	gulong size;
 	gchar buf[64];
@@ -108,7 +98,7 @@ void age_cell_data_func(GtkCellRenderer *renderer, GtkTreeModel *model,
 	g_object_set(renderer, "text", buf, NULL);
 }
 
-GtkWidget *create_view_and_model(char *path)
+GtkWidget *create_view_and_model(char *path, int mode, struct Data * data)
 {
 	GtkTreeViewColumn *col;
 	GtkCellRenderer *renderer;
@@ -153,10 +143,10 @@ GtkWidget *create_view_and_model(char *path)
 	gtk_tree_view_column_pack_start(col, renderer, TRUE);
 
 	/* connect a cell data function */
-	gtk_tree_view_column_set_cell_data_func(col, renderer,
-						age_cell_data_func, NULL, NULL);
+    gtk_tree_view_column_set_cell_data_func(col, renderer,
+                                            write_size, NULL, NULL);
 
-	model = create_and_fill_model(path);
+	model = create_and_fill_model(path, mode, data);
 
 	gtk_tree_view_set_model(GTK_TREE_VIEW(view), model);
 
@@ -193,8 +183,17 @@ void get_data(GtkButton *btn, struct Data *datas)
 	gtk_init(&datas->argc, &datas->argv);
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_widget_set_size_request(window, 800, 600);
 
-	view = create_view_and_model(datas->path);
+    int mode = 0;
+
+    if(strchr(datas->mask, '?') != NULL){
+        mode = 1;
+    } else if(strstr(datas->mask, "*.") != NULL) {
+        mode = 2;
+    }
+
+	view = create_view_and_model(datas->path, mode, datas);
 	scrolledWin = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWin),
 				       GTK_POLICY_AUTOMATIC,

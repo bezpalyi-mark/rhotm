@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 	g_signal_connect(window, "delete_event", gtk_main_quit,
 			 NULL); /* dirty */
 
+
 	view = create_view_and_model_for_data(&data);
 
 	gtk_container_add(GTK_CONTAINER(window), view);

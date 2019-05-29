@@ -179,31 +179,43 @@ void get_data(GtkButton *btn, struct Data *datas)
 	}
 
 	// g_signal_connect(window, "delete_event", gtk_main_quit, NULL); /* dirty */
-
-	gtk_init(&datas->argc, &datas->argv);
-
-	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_widget_set_size_request(window, 800, 600);
-
-    int mode = 0;
-
-    if(strchr(datas->mask, '?') != NULL){
-        mode = 1;
-    } else if(strstr(datas->mask, "*.") != NULL) {
-        mode = 2;
+	if(strcmp(datas->path, "") == 0)
+    {
+        GtkWidget *dialog;
+        dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+                                         GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+                                         "Entry path is required!");
+        gtk_window_set_title (GTK_WINDOW (dialog), "Error");
+        gtk_dialog_run (GTK_DIALOG (dialog));
+        gtk_widget_destroy (dialog);
     }
+	else
+    {
+        gtk_init(&datas->argc, &datas->argv);
 
-	view = create_view_and_model(datas->path, mode, datas);
-	scrolledWin = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWin),
-				       GTK_POLICY_AUTOMATIC,
-				       GTK_POLICY_AUTOMATIC);
+        window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+        gtk_widget_set_size_request(window, 800, 600);
 
-	gtk_container_add(GTK_CONTAINER(scrolledWin), view);
+        int mode = 0;
 
-	gtk_container_add(GTK_CONTAINER(window), scrolledWin);
+        if(strchr(datas->mask, '?') != NULL){
+            mode = 1;
+        } else if(strstr(datas->mask, "*.") != NULL) {
+            mode = 2;
+        }
 
-	gtk_widget_show_all(window);
+        view = create_view_and_model(datas->path, mode, datas);
+        scrolledWin = gtk_scrolled_window_new(NULL, NULL);
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWin),
+                                       GTK_POLICY_AUTOMATIC,
+                                       GTK_POLICY_AUTOMATIC);
+
+        gtk_container_add(GTK_CONTAINER(scrolledWin), view);
+
+        gtk_container_add(GTK_CONTAINER(window), scrolledWin);
+
+        gtk_widget_show_all(window);
+    }
 }
 
 GtkWidget *create_view_and_model_for_data(struct Data *data)

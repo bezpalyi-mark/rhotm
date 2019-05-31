@@ -1,9 +1,13 @@
 #include "get_path.h"
-#include "tests.h"
 
+/**
+ * @file main.c
+ * Main programm
+ * @author Team RHotM
+ * @version 1.1
+ * @date 2019.05.31
+ */
 
-//#define TEST
-#ifndef TEST
 int main(int argc, char **argv)
 {
 	GtkWidget *window;
@@ -17,9 +21,7 @@ int main(int argc, char **argv)
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-	g_signal_connect(window, "delete_event", gtk_main_quit,
-			 NULL);
-
+	g_signal_connect(window, "delete_event", gtk_main_quit, NULL);
 
 	view = create_view_and_model_for_data(&data);
 
@@ -31,13 +33,3 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-
-#else
-int main(){
-    FILE * file = freopen("tests_result.txt", "w", stderr);
-    if(test_mask()){
-        fprintf(stderr, "\nALL TESTS PASSED\n");
-    }
-    fclose(file);
-}
-#endif

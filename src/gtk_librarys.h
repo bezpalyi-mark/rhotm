@@ -4,6 +4,7 @@
 
 #ifndef GTK_ALL_AGAINE_GTK_LIBRARYS_H
 #define GTK_ALL_AGAINE_GTK_LIBRARYS_H
+
 #include <dirent.h>
 #include <errno.h>
 #include <gtk/gtk.h>
@@ -15,6 +16,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdbool.h>
+
 struct Data {
     char *path;
     char *mask;
@@ -22,4 +24,5 @@ struct Data {
     int argc;
     char **argv;
 };
+
 #endif //GTK_ALL_AGAINE_GTK_LIBRARYS_H

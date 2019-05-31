@@ -1,10 +1,13 @@
 #include "get_path.h"
+#include "tests.h"
 
+
+//#define TEST
+#ifndef TEST
 int main(int argc, char **argv)
 {
 	GtkWidget *window;
 	GtkWidget *view;
-	// GtkWidget *scrolledWin;
 
 	struct Data data;
 	data.argc = argc;
@@ -15,7 +18,7 @@ int main(int argc, char **argv)
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	g_signal_connect(window, "delete_event", gtk_main_quit,
-			 NULL); /* dirty */
+			 NULL);
 
 
 	view = create_view_and_model_for_data(&data);
@@ -28,3 +31,13 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+
+#else
+int main(){
+    FILE * file = freopen("tests_result.txt", "w", stderr);
+    if(test_mask()){
+        fprintf(stderr, "\nALL TESTS PASSED\n");
+    }
+    fclose(file);
+}
+#endif

@@ -8,7 +8,7 @@
 enum { COL_NAME = 0, COL_SIZE, NUM_COLS };
 GtkTreeIter child[1000];
 
-int scan_directory(char *pathName, GtkTreeStore *treestore, int count, int mode, struct Data * data)
+int scan_directory(char *pathName, GtkTreeStore *treestore, int count, struct Data * data)
 {
 	char newPath[PATH_MAX + 1];
 	DIR *dir = NULL;
@@ -18,6 +18,13 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count, int mode,
 	dir = opendir(pathName);
 	if (dir == NULL) {
 		printf("Error opening %s: %s", pathName, strerror(errno));
+        GtkWidget *dialog;
+        dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+                                         GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+                                         "No such directory!");
+        gtk_window_set_title (GTK_WINDOW (dialog), "Error");
+        gtk_dialog_run (GTK_DIALOG (dialog));
+        gtk_widget_destroy (dialog);
 		return 0;
 	}
 	readdir_r(dir, &entry, &entryPtr);
@@ -45,10 +52,10 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count, int mode,
 				gtk_tree_store_set(treestore, &child[count + 1],
 						   COL_NAME, entry.d_name,
 						   COL_SIZE, -1, -1);
-				scan_directory(newPath, treestore, ++count, mode, data);
+				scan_directory(newPath, treestore, ++count, data);
 				--count;
 			} else if (S_ISREG(entryInfo.st_mode)) {
-			    if(mask(entry.d_name, mode, data)) {
+			    if(mask(entry.d_name, data->mask)) {
                     gtk_tree_store_append(treestore,
                                           &child[count + 1],
                                           &child[count]);
@@ -66,17 +73,19 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count, int mode,
 	return --count;
 }
 
-GtkTreeModel *create_and_fill_model(char *pathName, int mode, struct Data * data)
+GtkTreeModel *create_and_fill_model(char *pathName, struct Data * data)
 {
 	GtkTreeStore *treestore;
 	GtkTreeIter toplevel;
 	treestore = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_ULONG);
-	scan_directory(pathName, treestore, 0, mode, data);
+	if(!scan_directory(pathName, treestore, 0, data)){
+        return  0;
+	}
 	return GTK_TREE_MODEL(treestore);
 }
 
-void write_size(GtkCellRenderer *renderer, GtkTreeModel *model,
-                GtkTreeIter *iter)
+void write_size(GtkTreeViewColumn *col, GtkCellRenderer *renderer, GtkTreeModel *model,
+                GtkTreeIter *iter, gpointer user_data)
 {
 	gulong size;
 	gchar buf[64];
@@ -98,7 +107,7 @@ void write_size(GtkCellRenderer *renderer, GtkTreeModel *model,
 	g_object_set(renderer, "text", buf, NULL);
 }
 
-GtkWidget *create_view_and_model(char *path, int mode, struct Data * data)
+GtkWidget *create_view_and_model(char *path, struct Data * data)
 {
 	GtkTreeViewColumn *col;
 	GtkCellRenderer *renderer;
@@ -146,7 +155,9 @@ GtkWidget *create_view_and_model(char *path, int mode, struct Data * data)
     gtk_tree_view_column_set_cell_data_func(col, renderer,
                                             write_size, NULL, NULL);
 
-	model = create_and_fill_model(path, mode, data);
+    if(!(model = create_and_fill_model(path, data))){
+        return NULL;
+    }
 
 	gtk_tree_view_set_model(GTK_TREE_VIEW(view), model);
 
@@ -179,7 +190,7 @@ void get_data(GtkButton *btn, struct Data *datas)
 	}
 
 	// g_signal_connect(window, "delete_event", gtk_main_quit, NULL); /* dirty */
-	if(strcmp(datas->path, "") == 0)
+    if(strcmp(datas->path, "") == 0)
     {
         GtkWidget *dialog;
         dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
@@ -189,22 +200,15 @@ void get_data(GtkButton *btn, struct Data *datas)
         gtk_dialog_run (GTK_DIALOG (dialog));
         gtk_widget_destroy (dialog);
     }
-	else
-    {
+    else {
         gtk_init(&datas->argc, &datas->argv);
 
         window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
         gtk_widget_set_size_request(window, 800, 600);
 
-        int mode = 0;
-
-        if(strchr(datas->mask, '?') != NULL){
-            mode = 1;
-        } else if(strstr(datas->mask, "*.") != NULL) {
-            mode = 2;
+        if(!(view = create_view_and_model(datas->path, datas))){
+            return;
         }
-
-        view = create_view_and_model(datas->path, mode, datas);
         scrolledWin = gtk_scrolled_window_new(NULL, NULL);
         gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWin),
                                        GTK_POLICY_AUTOMATIC,

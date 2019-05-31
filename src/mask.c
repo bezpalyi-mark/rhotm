@@ -1,34 +1,57 @@
 #include "mask.h"
 
-int mask(char * raw_data, int mode, struct Data * data){
+bool mask(char * raw_data, char * mask){
+    int mode = 0;
+    if(strchr(mask, '?') != NULL){
+        mode = 1;
+    } else if(strstr(mask, "*") != NULL) {
+        mode = 2;
+    }
+
+    char tok_mask[SEP_SIZE];
+    strcpy(tok_mask, mask);
+
     if(mode == 1){
         int position = 0;
         char tmp;
-        while(data->mask[position] != '?'){
+        while(mask[position] != '?'){
             position++;
         }
         tmp = raw_data[position];
         raw_data[position] = '?';
-        if(strcmp(raw_data, data->mask) == 0){
+        if(strcmp(raw_data, mask) == 0){
             raw_data[position] = tmp;
-            return 1;
+            return true;
         } else {
             raw_data[position] = tmp;
-            return 0;
+            return false;
         }
     }
 
     if(mode == 2){
-        char * tail = strchr(data->mask, '.');
-        char * tail_file = strchr(raw_data, '.');
-        if(tail_file == NULL){
-            return 0;
+        char sep[SEP_SIZE] ="*";
+        char * cmp_str;
+        cmp_str = strtok(tok_mask, sep);
+        if(strstr(raw_data, cmp_str) == NULL){
+            return false;
         }
-        if(strcmp(tail, tail_file) == 0){
-            return 1;
+        while(cmp_str != NULL){
+            if(!strstr(raw_data, cmp_str)){
+                return false;
+            }
+            cmp_str = strtok(NULL, sep);
         }
-        else return 0;
+
+        size_t size_data = strlen(raw_data);
+        size_t size_mask = strlen(mask);
+
+        while(size_data >= 0 && size_mask >= 0 && mask[size_mask-1] != '*'){
+            if(raw_data[size_data-1] != mask[size_mask-1])
+                return false;
+            size_data--;
+            size_mask--;
+        }
     }
 
-    return 1;
+    return true;
 }

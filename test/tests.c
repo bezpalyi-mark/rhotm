@@ -1,5 +1,4 @@
 #include "tests.h"
-#include "mask.h"
 
 bool test_mask(){
     char input[SIZE_STR] = {"myfile.doc.txt"};

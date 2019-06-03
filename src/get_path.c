@@ -4,9 +4,10 @@
 
 #include "get_path.h"
 #include "mask.h"
+#define CHILD_SIZE 1000
 
 enum { COL_NAME = 0, COL_SIZE, NUM_COLS };
-GtkTreeIter child[1000];
+GtkTreeIter child[CHILD_SIZE];
 
 int scan_directory(char *pathName, GtkTreeStore *treestore, int count,
 		   struct Data *data)
@@ -101,7 +102,7 @@ void write_size(GtkTreeViewColumn *col, GtkCellRenderer *renderer,
 		size /= MB;
 		g_snprintf(buf, sizeof(buf), "%ld MB", size);
 	} else if (size < KB) {
-		g_snprintf(buf, sizeof(buf), "%ld bites", size);
+		g_snprintf(buf, sizeof(buf), "%ld bytes", size);
 	} else if (size == -1) {
 		g_snprintf(buf, sizeof(buf), "");
 	}

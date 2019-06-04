@@ -36,7 +36,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count,
 	if (count == 0) {
 		gtk_tree_store_append(treestore, &child[count], NULL);
 		gtk_tree_store_set(treestore, &child[count], COL_NAME, pathName,
-				   COL_SIZE, (gulong)-1, -1);
+				   COL_SIZE, (gdouble)-1, -1);
 	}
 	while (entryPtr != NULL) {
 		struct stat entryInfo;
@@ -54,12 +54,12 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count,
 						      &child[count]);
 				gtk_tree_store_set(treestore, &child[count + 1],
 						   COL_NAME, entry.d_name,
-						   COL_SIZE, (gulong)-1, -1);
+						   COL_SIZE, (gdouble)-1, -1);
 				scan_directory(newPath, treestore, ++count,
 					       data);
 				--count;
 			} else if (S_ISREG(entryInfo.st_mode)) {
-				if (mask(entry.d_name, data->mask)) {
+				if (mask_func(entry.d_name, data->mask)) {
 					gtk_tree_store_append(treestore,
 							      &child[count + 1],
 							      &child[count]);
@@ -67,7 +67,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count,
 						treestore, &child[count + 1],
 						COL_NAME, entry.d_name,
 						COL_SIZE,
-						(gulong)entryInfo.st_size, -1);
+						(gdouble)entryInfo.st_size, -1);
 				}
 			}
 		}
@@ -81,7 +81,7 @@ GtkTreeModel *create_and_fill_model(char *pathName, struct Data *data)
 {
 	GtkTreeStore *treestore;
 	GtkTreeIter toplevel;
-	treestore = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_ULONG);
+	treestore = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_DOUBLE);
 	if (!scan_directory(pathName, treestore, 0, data)) {
 		return 0;
 	}
@@ -91,20 +91,23 @@ GtkTreeModel *create_and_fill_model(char *pathName, struct Data *data)
 void write_size(GtkTreeViewColumn *col, GtkCellRenderer *renderer,
 		GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data)
 {
-	gulong size;
+	gdouble size;
 	gchar buf[64];
 
 	gtk_tree_model_get(model, iter, COL_SIZE, &size, -1);
-	if (size >= KB && size < MB) {
+	if (size >= KB && size < MB && size != -1) {
 		size /= KB;
-		g_snprintf(buf, sizeof(buf), "%ld KB", size);
-	} else if (size >= MB && size < GB) {
+		g_snprintf(buf, sizeof(buf), "%.2f KB", size);
+	} else if (size >= MB && size < GB && size != -1) {
 		size /= MB;
-		g_snprintf(buf, sizeof(buf), "%ld MB", size);
-	} else if (size < KB) {
-		g_snprintf(buf, sizeof(buf), "%ld bytes", size);
+		g_snprintf(buf, sizeof(buf), "%.2f MB", size);
+	} else if (size < KB && size != -1) {
+		g_snprintf(buf, sizeof(buf), "%.2f Bytes", size);
 	} else if (size == -1) {
 		g_snprintf(buf, sizeof(buf), "");
+	} else if (size >= GB) {
+		size /= GB;
+		g_snprintf(buf, sizeof(buf), "%.2f GB", size);
 	}
 
 	g_object_set(renderer, "foreground-set", FALSE,

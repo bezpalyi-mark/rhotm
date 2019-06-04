@@ -7,6 +7,8 @@
 #define ONLY_ASTIRICS 3
 #define ONLY_QUES_MARK 4
 #define ASTIRICS_AND_QUES 5
+#define STR_SIZE 255
+#define SUB_SIZE 5
 
 /**
  * @file mask.h
@@ -22,4 +24,4 @@ Function, which make exception for some files
 @param char * mask - rules
 @return - is fitting string
 */
-bool mask(char * raw_data, char * mask);
+bool mask_func(char *raw_data, char *mask);

@@ -2,6 +2,11 @@
 #include "get_path.h"
 
 #define SEP_SIZE 1000
+#define ANY_SYMB 1
+#define EXPECTED_SYMB 2
+#define ONLY_ASTIRICS 3
+#define ONLY_QUES_MARK 4
+#define ASTIRICS_AND_QUES 5
 
 /**
  * @file mask.h

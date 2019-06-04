@@ -4,9 +4,10 @@
 
 #include "get_path.h"
 #include "mask.h"
+#define CHILD_SIZE 1000
 
 enum { COL_NAME = 0, COL_SIZE, NUM_COLS };
-GtkTreeIter child[1000];
+GtkTreeIter child[CHILD_SIZE];
 
 int scan_directory(char *pathName, GtkTreeStore *treestore, int count,
 		   struct Data *data)
@@ -35,7 +36,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count,
 	if (count == 0) {
 		gtk_tree_store_append(treestore, &child[count], NULL);
 		gtk_tree_store_set(treestore, &child[count], COL_NAME, pathName,
-				   COL_SIZE, -1, -1);
+				   COL_SIZE, (gulong)-1, -1);
 	}
 	while (entryPtr != NULL) {
 		struct stat entryInfo;
@@ -53,7 +54,7 @@ int scan_directory(char *pathName, GtkTreeStore *treestore, int count,
 						      &child[count]);
 				gtk_tree_store_set(treestore, &child[count + 1],
 						   COL_NAME, entry.d_name,
-						   COL_SIZE, -1, -1);
+						   COL_SIZE, (gulong)-1, -1);
 				scan_directory(newPath, treestore, ++count,
 					       data);
 				--count;
@@ -101,7 +102,9 @@ void write_size(GtkTreeViewColumn *col, GtkCellRenderer *renderer,
 		size /= MB;
 		g_snprintf(buf, sizeof(buf), "%ld MB", size);
 	} else if (size < KB) {
-		g_snprintf(buf, sizeof(buf), "%ld bites", size);
+		g_snprintf(buf, sizeof(buf), "%ld bytes", size);
+	} else if (size == -1) {
+		g_snprintf(buf, sizeof(buf), "");
 	}
 
 	g_object_set(renderer, "foreground-set", FALSE,

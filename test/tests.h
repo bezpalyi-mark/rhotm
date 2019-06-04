@@ -2,7 +2,7 @@
 #include "../src/mask.h"
 
 #define SIZE_STR 15
-#define SIZE_COUNT 6
+#define SIZE_COUNT 9
 
 bool test_mask();
 

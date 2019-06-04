@@ -1,14 +1,15 @@
 #include "tests.h"
 
+
 bool test_mask(){
     char input[SIZE_STR] = {"myfile.doc.txt"};
     char masks[SIZE_COUNT][SIZE_STR] = {"*.txt", "*.doc", "m*ile.doc.txt", "my*e.doc",
-                                        "m?file.doc.txt", "myfile?doc"};
-    bool results[SIZE_COUNT] = {true, false, true, false, true, false};
+                                        "m?file.doc.txt", "myfile?doc", "??????????.*", "???.*", "*.???"};
+    bool results[SIZE_COUNT] = {true, false, true, false, true, false, true, false, true};
     bool result = true;
     bool rez_mask;
     for(int i = 0; i < SIZE_COUNT; i++) {
-        rez_mask = mask(input, masks[i]);
+        rez_mask = mask_func(input, masks[i]);
         if(rez_mask != results[i]){
             result = false;
             fprintf(stderr, "Error in function mask,\n"

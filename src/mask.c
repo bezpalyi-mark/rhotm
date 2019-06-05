@@ -6,7 +6,24 @@ bool mask_func(char *raw_data, char *mask)
 	char temp[STR_SIZE];
 	strcpy(temp, mask);
 
-	if (strcmp(mask, "*") == 0) {
+	if (strstr(mask, "?*") || strstr(mask, "*?")) {
+		if (strchr(mask, '.') == NULL) {
+			int count_q = 0;
+			size_t size_mask = strlen(mask) - 1;
+			for (int i = 0; i < size_mask; i++) {
+				if (mask[i] == '?') {
+					count_q++;
+				}
+			}
+			if (strlen(raw_data) >= count_q) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			mode = MERGE_Q_AND_A;
+		}
+	} else if (strcmp(mask, "*") == 0) {
 		mode = ONLY_ASTIRICS;
 	} else if (strchr(mask, '*') && strchr(mask, '?')) {
 		mode = ASTIRICS_AND_QUES;
@@ -79,6 +96,7 @@ bool mask_func(char *raw_data, char *mask)
 				is_dot_exist = false;
 			}
 			if (is_dot_exist) {
+				bool some_dots = false;
 				char *parts_of_raw;
 				char *parts_of_mask;
 				int pos_else_dot[SUB_SIZE];
@@ -98,6 +116,7 @@ bool mask_func(char *raw_data, char *mask)
 						associate[count_subs] =
 							pos_last_dot;
 						count_subs++;
+						some_dots = true;
 					}
 					pos_last_dot--;
 				}
@@ -117,9 +136,119 @@ bool mask_func(char *raw_data, char *mask)
 					parts_of_mask = strtok(NULL, sep);
 					parts_of_raw = strtok(NULL, sep);
 				}
-				for (int i = 0; i < count_subs; i++) {
+				for (int i = 0; i < count_subs && some_dots;
+				     i++) {
 					raw_data[associate[i]] =
 						pos_else_dot[i];
+				}
+			} else {
+				return false;
+			}
+		}
+
+		if (mode == MERGE_Q_AND_A) {
+			bool result;
+			bool some_dots = false;
+			bool is_dot_exist = true;
+
+			if (strchr(raw_data, '.') == NULL) {
+				is_dot_exist = false;
+			}
+
+			if (is_dot_exist) {
+				size_t mask_size = strlen(mask) - 1;
+				int pos_else_dot[SUB_SIZE];
+				int associate[SUB_SIZE];
+				int count_subs = 0;
+				char sub = '-';
+				size_t pos_last_dot = strlen(raw_data) - 1;
+				while (raw_data[pos_last_dot] != '.') {
+					pos_last_dot--;
+				}
+				pos_last_dot--;
+				while (pos_last_dot != 1) {
+					if (raw_data[pos_last_dot] == '.') {
+						pos_else_dot[count_subs] =
+							raw_data[pos_last_dot];
+						raw_data[pos_last_dot] = sub;
+						associate[count_subs] =
+							pos_last_dot;
+						count_subs++;
+						some_dots = true;
+					}
+					pos_last_dot--;
+				}
+
+				bool first_part = false;
+				char *which_part = strstr(mask, "?*");
+				size_t size_part = strlen(which_part) - 1;
+				for (int i = 0; i < size_part; i++) {
+					if (which_part[i] == '.') {
+						first_part = true;
+					}
+				}
+				if (first_part) {
+					char temp_for_raw[STR_SIZE];
+					strcpy(temp_for_raw, raw_data);
+					char sep[SEP_SIZE] = ".";
+					char sep2[SEP_SIZE] = ".";
+					char *str;
+					char *p_mask;
+					str = strtok(temp_for_raw, sep);
+					int count_q = 0;
+					for (int i = 0; i < mask_size; i++) {
+						if (mask[i] == '?') {
+							count_q++;
+						}
+					}
+					if (strlen(str) >= count_q) {
+						str = strtok(NULL, sep);
+						p_mask = strtok(temp, sep2);
+						p_mask = strtok(NULL, sep2);
+						if (mask_func(str, p_mask)) {
+							result = true;
+						} else {
+							result = false;
+						}
+					} else {
+						result = false;
+					}
+					for (int i = 0;
+					     i < count_subs && some_dots; i++) {
+						raw_data[associate[i]] =
+							pos_else_dot[i];
+					}
+					return result;
+				} else {
+					char temp_for_raw[STR_SIZE];
+					strcpy(temp_for_raw, raw_data);
+					char sep[SEP_SIZE] = ".";
+					char *str = strtok(temp_for_raw, sep);
+					char *p_mask = strtok(temp, sep);
+					int count_q = 0;
+					char *dub_str = strstr(mask, ".");
+					for (int i = 0; dub_str[i] != '\0';
+					     i++) {
+						if (dub_str[i] == '?') {
+							count_q++;
+						}
+					}
+					if (mask_func(str, p_mask)) {
+						str = strtok(NULL, sep);
+						if (strlen(str) >= count_q) {
+							result = true;
+						} else {
+							result = false;
+						}
+					} else {
+						result = false;
+					}
+					for (int i = 0;
+					     i < count_subs && some_dots; i++) {
+						raw_data[associate[i]] =
+							pos_else_dot[i];
+					}
+					return result;
 				}
 			} else {
 				return false;

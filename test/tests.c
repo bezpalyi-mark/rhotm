@@ -4,8 +4,8 @@
 bool test_mask(){
     char input[SIZE_STR] = {"myfile.doc.txt"};
     char masks[SIZE_COUNT][SIZE_STR] = {"*.txt", "*.doc", "m*ile.doc.txt", "my*e.doc",
-                                        "m?file.doc.txt", "myfile?doc", "??????????.*", "???.*", "*.???"};
-    bool results[SIZE_COUNT] = {true, false, true, false, true, false, true, false, true};
+                                        "m?file.doc.txt", "myfile?doc", "??????????.*", "???.*", "*.???", "???*.*", "???????????*.*"};
+    bool results[SIZE_COUNT] = {true, false, true, false, true, false, true, false, true, true, false};
     bool result = true;
     bool rez_mask;
     for(int i = 0; i < SIZE_COUNT; i++) {

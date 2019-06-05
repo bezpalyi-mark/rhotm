@@ -7,6 +7,7 @@
 #define ONLY_ASTIRICS 3
 #define ONLY_QUES_MARK 4
 #define ASTIRICS_AND_QUES 5
+#define MERGE_Q_AND_A 6
 #define STR_SIZE 255
 #define SUB_SIZE 5
 

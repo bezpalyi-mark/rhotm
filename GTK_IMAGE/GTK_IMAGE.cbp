@@ -45,6 +45,22 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/usr/local/include/ImageMagick-7"/>
+					<Add directory="/usr/include/gtk-3.0"/>
+					<Add directory="/usr/include/at-spi2-atk/2.0"/>
+					<Add directory="/usr/include/at-spi-2.0"/>
+					<Add directory="/usr/include/dbus-1.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/dbus-1.0/include"/>
+					<Add directory="/usr/include/gio-unix-2.0"/>
+					<Add directory="/usr/include/cairo"/>
+					<Add directory="/usr/include/pango-1.0"/>
+					<Add directory="/usr/include/harfbuzz"/>
+					<Add directory="/usr/include/atk-1.0"/>
+					<Add directory="/usr/include/pixman-1"/>
+					<Add directory="/usr/include/freetype2"/>
+					<Add directory="/usr/include/libpng16"/>
+					<Add directory="/usr/include/gdk-pixbuf-2.0"/>
+					<Add directory="/usr/include/glib-2.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
 				</Compiler>
 				<MakeCommands>
 					<Build command="/usr/bin/make -f &quot;/home/hunterlan/NovaLab/GitLab/rhotm/GTK_IMAGE/Makefile&quot;  VERBOSE=1 GTK_IMAGE"/>
@@ -61,6 +77,22 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/usr/local/include/ImageMagick-7"/>
+					<Add directory="/usr/include/gtk-3.0"/>
+					<Add directory="/usr/include/at-spi2-atk/2.0"/>
+					<Add directory="/usr/include/at-spi-2.0"/>
+					<Add directory="/usr/include/dbus-1.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/dbus-1.0/include"/>
+					<Add directory="/usr/include/gio-unix-2.0"/>
+					<Add directory="/usr/include/cairo"/>
+					<Add directory="/usr/include/pango-1.0"/>
+					<Add directory="/usr/include/harfbuzz"/>
+					<Add directory="/usr/include/atk-1.0"/>
+					<Add directory="/usr/include/pixman-1"/>
+					<Add directory="/usr/include/freetype2"/>
+					<Add directory="/usr/include/libpng16"/>
+					<Add directory="/usr/include/gdk-pixbuf-2.0"/>
+					<Add directory="/usr/include/glib-2.0"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
 				</Compiler>
 				<MakeCommands>
 					<Build command="/usr/bin/make -f &quot;/home/hunterlan/NovaLab/GitLab/rhotm/GTK_IMAGE/Makefile&quot;  VERBOSE=1 GTK_IMAGE/fast"/>
@@ -80,10 +112,13 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/hunterlan/NovaLab/GitLab/rhotm/GTK_IMAGE/src/Images.cpp">
+		<Unit filename="/home/hunterlan/NovaLab/GitLab/rhotm/GTK_IMAGE/src/Functions.cpp">
 			<Option target="GTK_IMAGE"/>
 		</Unit>
-		<Unit filename="/home/hunterlan/NovaLab/GitLab/rhotm/GTK_IMAGE/src/Images.h">
+		<Unit filename="/home/hunterlan/NovaLab/GitLab/rhotm/GTK_IMAGE/src/Functions.h">
+			<Option target="GTK_IMAGE"/>
+		</Unit>
+		<Unit filename="/home/hunterlan/NovaLab/GitLab/rhotm/GTK_IMAGE/src/MainWindow.h">
 			<Option target="GTK_IMAGE"/>
 		</Unit>
 		<Unit filename="/home/hunterlan/NovaLab/GitLab/rhotm/GTK_IMAGE/src/main.cpp">
